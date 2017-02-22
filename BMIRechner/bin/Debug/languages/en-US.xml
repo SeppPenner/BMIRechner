@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Language xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <Identifier>en-US</Identifier> <!--According to https://msdn.microsoft.com/de-de/library/ee825488(v=cs.20).aspx-->
+	<Name>English (US)</Name>
+	<Words>
+		<Word>
+			<Key>Title</Key>
+			<Value>BMI Calculator</Value>
+		</Word>
+		<Word>
+			<Key>ExtremeUnderweight</Key>
+			<Value>Extreme underweight</Value>
+		</Word>
+		<Word>
+			<Key>Underweight</Key>
+			<Value>Underweight</Value>
+		</Word>
+		<Word>
+			<Key>LightUnderweight</Key>
+			<Value>Light underweight</Value>
+		</Word>
+		<Word>
+			<Key>NormalWeight</Key>
+			<Value>Normalgewicht</Value>
+		</Word>
+		<Word>
+			<Key>PreAdiposity</Key>
+			<Value>Pre adiposity</Value>
+		</Word>
+		<Word>
+			<Key>AdiposityGrade1</Key>
+			<Value>Adiposity grade I</Value>
+		</Word>
+		<Word>
+			<Key>AdiposityGrade2</Key>
+			<Value>Adipositas grade II</Value>
+		</Word>
+		<Word>
+			<Key>AdiposityGrade3</Key>
+			<Value>Adipositas grade III</Value>
+		</Word>
+		<Word>
+			<Key>Size</Key>
+			<Value>Size in cm:</Value>
+		</Word>
+		<Word>
+			<Key>Weight</Key>
+			<Value>Weight in kg:</Value>
+		</Word>
+		<Word>
+			<Key>Result</Key>
+			<Value>Result:</Value>
+		</Word>
+		<Word>
+			<Key>Calculate</Key>
+			<Value>Calculate BMI</Value>
+		</Word>
+	</Words>
+</Language>
