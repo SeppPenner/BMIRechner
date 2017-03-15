@@ -46,7 +46,7 @@ Source: "C:\Users\tim\Desktop\BMIRechner\BMIRechner\bin\Debug\BMI.ico"; DestDir:
 Source: "C:\Users\tim\Desktop\BMIRechner\BMIRechner\bin\Debug\BMIRechner.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\tim\Desktop\BMIRechner\BMIRechner\bin\Debug\Languages.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\tim\Desktop\BMIRechner\BMIRechner\bin\Debug\License.txt"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\tim\Desktop\BMIRechner\BMIRechner\bin\Debug\languages\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Users\tim\Desktop\BMIRechner\BMIRechner\bin\Debug\languages\*"; DestDir: "{app}\languages\"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
