@@ -2,11 +2,11 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "BMIRechner"
-#define MyAppVersion "1.0.0.3"
+#define MyAppVersion "1.0.1.0"
 #define MyAppPublisher "Hämmer Electronics"
 #define MyAppURL "www.softwareload24.de.tl"
 #define MyAppExeName "BMIRechner.exe"
-#define MyPath "C:\Users\tim\Desktop\Updaten_Snyk\BMIRechner"
+#define MyPath "C:\Users\Tim\Documents\Git\C# und VB\BMIRechner"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -23,7 +23,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={pf}\{#MyAppName}
+DefaultDirName={commonpf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 LicenseFile={#MyPath}\BMIRechner\bin\Debug\License.txt
@@ -42,12 +42,12 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 
 [Files]
-Source: "{#MyPath}\BMIRechner\bin\Debug\BMIRechner.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#MyPath}\BMIRechner\bin\Debug\BMI.ico"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#MyPath}\BMIRechner\bin\Debug\BMIRechner.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#MyPath}\BMIRechner\bin\Debug\Languages.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#MyPath}\BMIRechner\bin\Debug\License.txt"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#MyPath}\BMIRechner\bin\Debug\languages\*"; DestDir: "{app}\languages\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#MyPath}\BMIRechner\bin\Release\BMIRechner.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyPath}\BMIRechner\bin\Release\BMI.ico"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyPath}\BMIRechner\bin\Release\BMIRechner.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyPath}\BMIRechner\bin\Release\Languages.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyPath}\BMIRechner\bin\Release\License.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyPath}\BMIRechner\bin\Release\languages\*"; DestDir: "{app}\languages\"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
