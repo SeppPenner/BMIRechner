@@ -26,10 +26,10 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={commonpf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
-LicenseFile={#MyPath}\BMIRechner\bin\Debug\License.txt
+LicenseFile={#MyPath}\BMIRechner\bin\Release\License.txt
 OutputDir={#MyPath}\Setup
 OutputBaseFilename=BMIRechner-Setup
-SetupIconFile={#MyPath}\BMIRechner\bin\Debug\BMI.ico
+SetupIconFile={#MyPath}\BMIRechner\bin\Release\BMI.ico
 Compression=lzma
 SolidCompression=yes
 
