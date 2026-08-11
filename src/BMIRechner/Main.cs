@@ -56,9 +56,11 @@ public partial class Main : Form
     {
         var mass = Convert.ToDouble(this.numericUpDown_Weight.Value);
         var length = Convert.ToDouble(this.numericUpDown_Size.Value);
-        this.result = Math.Round(mass / Math.Pow(length / 100, 2), 2);
+        this.result = BmiCalculator.Calculate(mass, length);
         this.TextBoxResult.Text = this.result.ToString(CultureInfo.InvariantCulture);
-        var color = this.DetermineColor(this.result);
+        var category = BmiCalculator.DetermineCategory(this.result);
+        this.TextBoxResultText.Text = this.languageManager.GetCurrentLanguage().GetWord(BmiCalculator.GetLanguageKey(category));
+        var color = DetermineColor(category);
         this.TextBoxResult.BackColor = color;
         this.TextBoxResultText.BackColor = color;
         this.CheckColor(color);
@@ -83,56 +85,25 @@ public partial class Main : Form
     }
 
     /// <summary>
-    /// Determines the color.
+    /// Determines the color of the result boxes.
     /// </summary>
-    /// <param name="bmi">The BMI.</param>
+    /// <param name="category">The body mass index category.</param>
     /// <returns>The corresponding color.</returns>
-    private Color DetermineColor(double bmi)
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if the category is not a known one.</exception>
+    private static Color DetermineColor(BmiCategory category)
     {
-        if (bmi < 16)
+        return category switch
         {
-            this.TextBoxResultText.Text = this.languageManager.GetCurrentLanguage().GetWord("ExtremeUnderweight");
-            return Color.DarkBlue;
-        }
-
-        if (bmi < 17)
-        {
-            this.TextBoxResultText.Text = this.languageManager.GetCurrentLanguage().GetWord("Underweight");
-            return Color.Blue;
-        }
-
-        if (bmi < 18.5)
-        {
-            this.TextBoxResultText.Text = this.languageManager.GetCurrentLanguage().GetWord("LightUnderweight");
-            return Color.CadetBlue;
-        }
-
-        if (bmi < 25)
-        {
-            this.TextBoxResultText.Text = this.languageManager.GetCurrentLanguage().GetWord("NormalWeight");
-            return Color.Green;
-        }
-
-        if (bmi < 30)
-        {
-            this.TextBoxResultText.Text = this.languageManager.GetCurrentLanguage().GetWord("PreAdiposity");
-            return Color.Yellow;
-        }
-
-        if (bmi < 35)
-        {
-            this.TextBoxResultText.Text = this.languageManager.GetCurrentLanguage().GetWord("AdiposityGrade1");
-            return Color.Orange;
-        }
-
-        if (bmi < 40)
-        {
-            this.TextBoxResultText.Text = this.languageManager.GetCurrentLanguage().GetWord("AdiposityGrade2");
-            return Color.Red;
-        }
-
-        this.TextBoxResultText.Text = this.languageManager.GetCurrentLanguage().GetWord("AdiposityGrade3");
-        return Color.DarkRed;
+            BmiCategory.ExtremeUnderweight => Color.DarkBlue,
+            BmiCategory.Underweight => Color.Blue,
+            BmiCategory.LightUnderweight => Color.CadetBlue,
+            BmiCategory.NormalWeight => Color.Green,
+            BmiCategory.PreAdiposity => Color.Yellow,
+            BmiCategory.AdiposityGrade1 => Color.Orange,
+            BmiCategory.AdiposityGrade2 => Color.Red,
+            BmiCategory.AdiposityGrade3 => Color.DarkRed,
+            _ => throw new ArgumentOutOfRangeException(nameof(category), category, "The body mass index category is unknown.")
+        };
     }
 
     /// <summary>

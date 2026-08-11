@@ -9,19 +9,25 @@ The repository is an application, it is **not** a library and **not** published 
 no `GeneratePackageOnBuild`, no push script. What gets released is an Inno Setup installer that is
 tracked in this repository.
 
-One solution `src/BMIRechner.sln` with exactly one project:
+One solution `src/BMIRechner.sln` with exactly two projects:
 
 - `src/BMIRechner/BMIRechner.csproj`, `OutputType` `WinExe`, `TargetFramework` `net10.0-windows`,
-  `UseWindowsForms`, `ApplicationIcon` `BMI.ico`.
+  `UseWindowsForms`, `ApplicationIcon` `BMI.ico`, the application.
+- `src/BMIRechner.Tests/BMIRechner.Tests.csproj`, MSTest, added in version 1.0.8.0.
 
 Layout inside `src/BMIRechner`:
 
 - `Program.cs`: `[STAThread] Main`, enables visual styles and runs the `Main` form. Nothing else.
-- `Main.cs`: everything the application does. The constructor initializes the designer controls,
-  the language manager and the combo box, `ButtonResultClick` calculates, `DetermineColor` maps a
-  BMI to a color and writes the category text, `LoadTitle` builds the window title,
-  `OnLanguageChanged` retranslates the whole form. Keep new logic in that shape, one method per
-  concern.
+- `BmiCalculator.cs`: the calculation and everything that can be decided without a form.
+  `Calculate` returns the body mass index rounded to two decimals, `DetermineCategory` maps it to a
+  `BmiCategory` and `GetLanguageKey` maps a category to the key of the matching word in the language
+  files. No user interface code goes in here, that is what makes it testable.
+- `BmiCategory.cs`: the eight WHO categories. The names are the keys of the language files.
+- `Main.cs`: everything that needs the form. The constructor initializes the designer controls, the
+  language manager and the combo box, `ButtonResultClick` reads the two numeric up downs and writes
+  the result, `DetermineColor` maps a category to a color, `CheckColor` picks the foreground color,
+  `LoadTitle` builds the window title, `OnLanguageChanged` retranslates the whole form. Keep new
+  logic in that shape, one method per concern.
 - `Main.Designer.cs` and `Main.resx`: designer generated, German comments, do not reformat.
 - `GlobalUsings.cs`: all usings of the project.
 - `languages/de-DE.xml` and `languages/en-US.xml`: the translations, copied to the output directory
@@ -29,11 +35,23 @@ Layout inside `src/BMIRechner`:
 - `License.txt`: copied to the output directory as well, the installer shows it.
 - `BMI.ico`: the application and installer icon.
 
+Layout inside `src/BMIRechner.Tests`:
+
+- `BmiCalculatorTests.cs`: the rounding, the value of the readme screenshots, the guard against a
+  mass or size of zero, every band bound of `DetermineCategory` from both sides, the range the form
+  can produce and the mapping to the language keys.
+- `LanguageFilesTests.cs`: both language files are found and read, every category and every user
+  interface key has a non empty word in both languages, both files define the same keys, and the
+  English file does not contain the German words it used to contain.
+- `GlobalUsings.cs`: all usings of the test project.
+- The two language files are **linked** into the test project (`None Include` with `Link`), not
+  copied, because the language library reads them from the output directory. Do not duplicate them.
+
 Repository root: `README.md` (the only user documentation, badges and the two screenshots),
 `Changelog.md`, `License.txt` (MIT), `Screenshot_DE.PNG`, `Screenshot_EN.PNG`, `.gitattributes`,
 `.gitignore` and the `Setup` folder. `src` holds `.editorconfig` and
-`BMIRechner.sln.DotSettings` next to the solution. There is no `Updating.md`, no `HowToUse.md`,
-no `.github` folder and no test project.
+`BMIRechner.sln.DotSettings` next to the solution. There is no `Updating.md`, no `HowToUse.md`
+and no `.github` folder.
 
 `Setup` holds the release machinery:
 
@@ -49,11 +67,16 @@ no `.github` folder and no test project.
 dotnet build src/BMIRechner.sln -c Release
 ```
 
-- Single target framework `net10.0-windows` in the only project, no multi-targeting.
-  `RuntimeIdentifiers` is `win-x64`. The application is Windows only, it is a Windows Forms
-  executable.
-- All build properties live directly in `src/BMIRechner/BMIRechner.csproj`. There is **no**
-  `Directory.Build.props` in this repository.
+```powershell
+dotnet test src/BMIRechner.sln -c Release
+```
+
+- Single target framework `net10.0-windows` in both projects, no multi-targeting.
+  `RuntimeIdentifiers` is `win-x64` in the application. The application is Windows only, it is a
+  Windows Forms executable, and the test project has to carry the same `-windows` framework to be
+  allowed to reference it.
+- All build properties live directly in the two `.csproj` files and are duplicated there. There is
+  **no** `Directory.Build.props` in this repository.
 - `TreatWarningsAsErrors` is enabled, so every warning breaks the build, NuGet warnings (`NU****`)
   from restore included. A clean build reports zero warnings, keep it that way.
 - `NU1803` (HTTP source usage during restore) is the one warning suppressed via `NoWarn`. Fix
@@ -64,9 +87,16 @@ dotnet build src/BMIRechner.sln -c Release
 - Restore needs nuget.org. If a private feed is configured globally on the machine and answers 404
   for public packages, restore fails with `NU1301`. Then build with an explicit source:
   `dotnet build src/BMIRechner.sln --source https://api.nuget.org/v3/index.json`.
-- There are no automated tests. A behaviour change is verified by running the executable: the form
-  has to come up, the language combo box has to hold both languages, and a calculation has to
-  produce the expected value and color.
+- Tests are MSTest, in the single test project `src/BMIRechner.Tests`, which follows the same
+  package set as the sibling repositories: `Microsoft.NET.Test.Sdk`, `MSTest.TestAdapter`,
+  `MSTest.TestFramework`, `coverlet.collector` and `GitVersion.MsBuild`. `dotnet test` runs 12
+  tests, they need no network and they write nothing. Never claim a test run happened without
+  running it.
+- The tests cover the calculation and the language files, they cannot cover the form. Beyond them, a
+  behaviour change is verified by starting the executable: the window has to come up, its title has
+  to read the translated name plus the version, the combo box has to hold both languages, and a
+  calculation has to produce the expected value and color. The window title can be read without a
+  screenshot via `(Start-Process <exe> -PassThru).MainWindowTitle`.
 
 ## Code conventions
 
@@ -76,7 +106,8 @@ Follow the surrounding code, it is consistent throughout every hand written file
   `<summary>`, then the file-scoped namespace. `Main.Designer.cs` is exempt, it is generated.
 - XML doc comments on every type and every member, private members included, no exceptions.
 - `Nullable`, `ImplicitUsings` and `LangVersion latest` are enabled.
-- New `using` directives go into `GlobalUsings.cs`, inside the existing `#pragma warning disable
+- New `using` directives go into the `GlobalUsings.cs` of the respective project, inside the
+  existing `#pragma warning disable
   IDE0065` block, never at the top of a file. The editorconfig requires usings inside the namespace
   (`csharp_using_directive_placement=inside_namespace:warning`), which global usings cannot satisfy,
   that is what the pragma is for. Do not add other pragmas. The comment text in that block is
@@ -108,8 +139,9 @@ Do not silently "clean up" these, they are existing behaviour:
   `24.07`, not `24,07`. That is what the released screenshot shows, do not switch it to the current
   culture without asking.
 - **`GetWord` returns `null` for an unknown key** and does not fall back to another language, so
-  every key used in `Main.cs` has to exist in both language files. Missing keys show up as empty
-  labels at runtime, not as an error.
+  every key that `Main.cs` and `BmiCalculator.GetLanguageKey` ask for has to exist in both language
+  files. Missing keys show up as empty labels at runtime, not as an error. `LanguageFilesTests`
+  exists for exactly that reason.
 - **The language files are loaded by file system location.** The package
   `HaemmerElectronics.SeppPenner.Language` enumerates the `languages` folder next to its own
   assembly, so `CopyToOutputDirectory=Always` is what makes the application work at all, and the
