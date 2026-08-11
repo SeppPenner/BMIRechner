@@ -11,7 +11,7 @@ tracked in this repository.
 
 One solution `src/BMIRechner.sln` with exactly one project:
 
-- `src/BMIRechner/BMIRechner.csproj`, `OutputType` `WinExe`, `TargetFramework` `net9.0-windows`,
+- `src/BMIRechner/BMIRechner.csproj`, `OutputType` `WinExe`, `TargetFramework` `net10.0-windows`,
   `UseWindowsForms`, `ApplicationIcon` `BMI.ico`.
 
 Layout inside `src/BMIRechner`:
@@ -49,7 +49,7 @@ no `.github` folder and no test project.
 dotnet build src/BMIRechner.sln -c Release
 ```
 
-- Single target framework `net9.0-windows` in the only project, no multi-targeting.
+- Single target framework `net10.0-windows` in the only project, no multi-targeting.
   `RuntimeIdentifiers` is `win-x64`. The application is Windows only, it is a Windows Forms
   executable.
 - All build properties live directly in `src/BMIRechner/BMIRechner.csproj`. There is **no**
