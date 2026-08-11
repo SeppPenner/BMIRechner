@@ -1,5 +1,6 @@
 # Change history
 
+* **Version 1.0.8.0 (2026-08-11)** : Updated nuget packages, moved to Net 10.0, fixed the window title and the English language file, added a test project, the setup is self contained now.
 * **Version 1.0.7.0 (2025-01-05)** : Updated Nuget packages, added audit mode, moved to Net9.0.
 * **Version 1.0.6.0 (2023-12-30)** : Updated nuget packages, moved to Net 8.0.
 * **Version 1.0.5.0 (2022-11-21)** : Updated nuget packages, moved to Net 7.0.

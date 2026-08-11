@@ -55,9 +55,9 @@ and no `.github` folder.
 
 `Setup` holds the release machinery:
 
-- `build-setup-files.bat`: deletes every `bin` and `obj` below `src`, publishes the application to
-  `src/BMIRechner/bin/publish` and removes the `*.pdb` files. It does **not** compile the
-  installer.
+- `build-setup-files.bat`: deletes every `bin` and `obj` below `src`, publishes the application
+  **self contained** for `win-x64` to `src/BMIRechner/bin/publish` and removes the `*.pdb` files.
+  It does **not** compile the installer.
 - `BMIRechner-Setup.iss`: the Inno Setup script, packs the whole publish folder.
 - `BMIRechner-Setup.exe`: the built installer, tracked in git.
 
@@ -166,6 +166,16 @@ Do not silently "clean up" these, they are existing behaviour:
   cannot be triggered from the user interface.
 - **The installer is tracked although `.gitignore` excludes `*.exe`.** `Setup/BMIRechner-Setup.exe`
   is in the repository and has to be added with `git add -f` after every release build.
+- **The publish is self contained since version 1.0.8.0.** The installed application no longer
+  needs a .NET desktop runtime on the target machine, and in exchange the installer grew from
+  1.8 MB to around 35 MB. A published `BMIRechner.runtimeconfig.json` with a `frameworks` block
+  instead of `includedFrameworks` means the switch got lost, that is the fastest way to check it.
+  Every release adds those megabytes to the git history for good, so moving the installer to a
+  release asset is worth a thought at some point.
+- **Inno Setup warns on every compile.** `PrivilegesRequired` defaults to `admin` while the quick
+  launch icon uses `{userappdata}`. The icon is limited to Windows 7 and older via
+  `OnlyBelowVersion: 0,6.1`, so it never gets created anyway. The warning is expected, do not
+  mistake it for a broken script.
 - **AppVeyor badge without CI in the repository.** `README.md` links an AppVeyor build that is
   configured outside of this repository. There is no `.github` folder and no pipeline file here.
 - **`src/BMIRechner.sln.DotSettings`** is tracked and holds nothing but a ReSharper user dictionary
