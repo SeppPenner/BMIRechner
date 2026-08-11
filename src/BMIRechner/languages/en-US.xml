@@ -13,7 +13,7 @@
 		</Word>
 		<Word>
 			<Key>Underweight</Key>
-			<Value>Underweight</Value>
+			<Value>Moderate underweight</Value>
 		</Word>
 		<Word>
 			<Key>LightUnderweight</Key>
@@ -21,7 +21,7 @@
 		</Word>
 		<Word>
 			<Key>NormalWeight</Key>
-			<Value>Normalgewicht</Value>
+			<Value>Normal weight</Value>
 		</Word>
 		<Word>
 			<Key>PreAdiposity</Key>
@@ -33,11 +33,11 @@
 		</Word>
 		<Word>
 			<Key>AdiposityGrade2</Key>
-			<Value>Adipositas grade II</Value>
+			<Value>Adiposity grade II</Value>
 		</Word>
 		<Word>
 			<Key>AdiposityGrade3</Key>
-			<Value>Adipositas grade III</Value>
+			<Value>Adiposity grade III</Value>
 		</Word>
 		<Word>
 			<Key>Size</Key>

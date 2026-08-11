@@ -19,8 +19,9 @@ Layout inside `src/BMIRechner`:
 - `Program.cs`: `[STAThread] Main`, enables visual styles and runs the `Main` form. Nothing else.
 - `Main.cs`: everything the application does. The constructor initializes the designer controls,
   the language manager and the combo box, `ButtonResultClick` calculates, `DetermineColor` maps a
-  BMI to a color and writes the category text, `OnLanguageChanged` retranslates the whole form.
-  Keep new logic in that shape, one method per concern.
+  BMI to a color and writes the category text, `LoadTitle` builds the window title,
+  `OnLanguageChanged` retranslates the whole form. Keep new logic in that shape, one method per
+  concern.
 - `Main.Designer.cs` and `Main.resx`: designer generated, German comments, do not reformat.
 - `GlobalUsings.cs`: all usings of the project.
 - `languages/de-DE.xml` and `languages/en-US.xml`: the translations, copied to the output directory
@@ -90,20 +91,19 @@ Follow the surrounding code, it is consistent throughout every hand written file
 
 Do not silently "clean up" these, they are existing behaviour:
 
-- **The window title is built in two places.** `LoadTitleAndDescription` writes
-  `Application.ProductName + string.Empty + Application.ProductVersion`, `OnLanguageChanged` writes
-  the translated `Title` word plus the same version. The constructor calls
-  `LoadTitleAndDescription` last, so at startup the title is the assembly name with no separator
-  before the version, and the translated title only appears once the language is switched.
-  `Screenshot_DE.PNG` shows what it is supposed to look like: `BMI Rechner 1.0.0.1`.
+- **The window title comes from the language file.** `LoadTitle` is the only place that assigns
+  `Text`, it writes the translated `Title` word, a blank and `Application.ProductVersion`.
+  `OnLanguageChanged` calls it again after a language switch. `Screenshot_DE.PNG` shows the expected
+  result: `BMI Rechner 1.0.0.1`.
 - **`Application.ProductVersion` is the GitVersion informational version.** On an untagged commit
   the title therefore reads something like `BMI Rechner 1.0.8-1+Branch.master.Sha...`, on a tagged
   one just `1.0.8`.
-- **The combo box calculates.** `LoadLanguagesToCombo` sets `SelectedIndex = 0`, which raises
-  `SelectedIndexChanged`, which sets the language, which raises `OnLanguageChanged`, which calls
-  `ButtonResultClick`. So the application computes a BMI from the default values 1 cm and 1 kg
-  before the user has entered anything, which is 10000 and therefore dark red
-  "Adipositas Grad III".
+- **The language changed event is subscribed late on purpose.** `LoadLanguagesToCombo` sets
+  `SelectedIndex = 0`, which raises `SelectedIndexChanged`, which sets the language, which raises
+  `OnLanguageChanged`, which calls `ButtonResultClick`. The constructor therefore subscribes the
+  handler after the combo box is filled. Moving that line back into
+  `InitializeLanguageManager` makes the application show a BMI of 10000 (the default 1 cm and 1 kg)
+  in dark red before the user has entered anything.
 - **The result is formatted with `CultureInfo.InvariantCulture`.** The German user interface shows
   `24.07`, not `24,07`. That is what the released screenshot shows, do not switch it to the current
   culture without asking.

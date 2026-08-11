@@ -32,15 +32,19 @@ public partial class Main : Form
         this.InitializeComponent();
         this.InitializeLanguageManager();
         this.LoadLanguagesToCombo();
-        this.LoadTitleAndDescription();
+
+        // The language changed event is subscribed after the combo box is filled on purpose. Setting the selected
+        // index raises it, and that would calculate a body mass index from the default values before any input.
+        this.languageManager.OnLanguageChanged += this.OnLanguageChanged!;
+        this.LoadTitle();
     }
 
     /// <summary>
-    /// Loads the title and description.
+    /// Loads the window title from the current language and the version of the executable.
     /// </summary>
-    private void LoadTitleAndDescription()
+    private void LoadTitle()
     {
-        this.Text = Application.ProductName + string.Empty + Application.ProductVersion;
+        this.Text = $"{this.languageManager.GetCurrentLanguage().GetWord("Title")} {Application.ProductVersion}";
     }
 
     /// <summary>
@@ -132,12 +136,11 @@ public partial class Main : Form
     }
 
     /// <summary>
-    /// Initializes the language manager.
+    /// Initializes the language manager with the language that is shown at startup.
     /// </summary>
     private void InitializeLanguageManager()
     {
         this.languageManager.SetCurrentLanguage("de-DE");
-        this.languageManager.OnLanguageChanged += this.OnLanguageChanged!;
     }
 
     /// <summary>
@@ -167,10 +170,10 @@ public partial class Main : Form
     /// Handles the on language changed event.
     /// </summary>
     /// <param name="sender">The sender.</param>
-    /// <param name="e">The event args.</param>
+    /// <param name="eventArgs">The event args.</param>
     private void OnLanguageChanged(object sender, EventArgs eventArgs)
     {
-        this.Text = this.languageManager.GetCurrentLanguage().GetWord("Title") + string.Empty + Application.ProductVersion;
+        this.LoadTitle();
         this.LabelSize.Text = this.languageManager.GetCurrentLanguage().GetWord("Size");
         this.LabelWeight.Text = this.languageManager.GetCurrentLanguage().GetWord("Weight");
         this.LabelResult.Text = this.languageManager.GetCurrentLanguage().GetWord("Result");
