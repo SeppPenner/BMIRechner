@@ -59,7 +59,8 @@ and no `.github` folder.
   **self contained** for `win-x64` to `src/BMIRechner/bin/publish` and removes the `*.pdb` files.
   It does **not** compile the installer.
 - `BMIRechner-Setup.iss`: the Inno Setup script, packs the whole publish folder.
-- `BMIRechner-Setup.exe`: the built installer, tracked in git.
+- `BMIRechner-Setup.exe`: the built installer, not tracked, it hangs on the GitHub release of its
+  version tag.
 
 ## Build
 
@@ -164,18 +165,20 @@ Do not silently "clean up" these, they are existing behaviour:
   `< 18.5`, `< 25`, `< 30`, `< 35`, `< 40`, everything else is grade III. The numeric up downs are
   limited to 1 to 230 cm (whole numbers) and 1 to 400 kg (one decimal), so a division by zero
   cannot be triggered from the user interface.
-- **The installer is tracked although `.gitignore` excludes `*.exe`.** `Setup/BMIRechner-Setup.exe`
-  is in the repository and has to be added with `git add -f` after every release build.
+- **The installer is not tracked, it belongs on the release.** `Setup/BMIRechner-Setup.exe` was in
+  the repository up to and including 1.0.8, added with `git add -f` against the `*.exe` rule of
+  `.gitignore`. Do not add it back.
 - **The publish is self contained since version 1.0.8.0.** The installed application no longer
   needs a .NET desktop runtime on the target machine, and in exchange the installer grew from
   1.8 MB to around 35 MB. A published `BMIRechner.runtimeconfig.json` with a `frameworks` block
   instead of `includedFrameworks` means the switch got lost, that is the fastest way to check it.
-  Every release adds those megabytes to the git history for good, so moving the installer to a
-  release asset is worth a thought at some point.
-- **Inno Setup warns on every compile.** `PrivilegesRequired` defaults to `admin` while the quick
-  launch icon uses `{userappdata}`. The icon is limited to Windows 7 and older via
-  `OnlyBelowVersion: 0,6.1`, so it never gets created anyway. The warning is expected, do not
-  mistake it for a broken script.
+  Up to and including 1.0.8 every release added those megabytes to the git history, which is why the
+  installer moved to the release assets.
+- **The Inno Setup compile is warning free, keep it that way.** Up to and including 1.0.8 the script
+  had a `quicklaunchicon` task that wrote into `{userappdata}` while `PrivilegesRequired` defaults to
+  `admin`, which made `ISCC.exe` print the `UsedUserAreasWarning` on every compile. The task was
+  limited to Windows 7 and older via `OnlyBelowVersion: 0,6.1` and never created anything, so it is
+  gone. Do not put a per-user path back into the script.
 - **AppVeyor badge without CI in the repository.** `README.md` links an AppVeyor build that is
   configured outside of this repository. There is no `.github` folder and no pipeline file here.
 - **`src/BMIRechner.sln.DotSettings`** is tracked and holds nothing but a ReSharper user dictionary
@@ -196,14 +199,31 @@ Do not silently "clean up" these, they are existing behaviour:
 6. Only now build the installer, because the version in the executable comes from the tag:
    run `Setup/build-setup-files.bat`, then compile `Setup/BMIRechner-Setup.iss` with
    `ISCC.exe` (`C:\Program Files (x86)\Inno Setup 6\ISCC.exe`).
-7. `git add -f Setup/BMIRechner-Setup.exe` and commit it, the existing commits for that step are
-   called `Updated setup.`.
-8. Push the commits and the tag.
+7. Push the commits and the tag.
+8. Attach `Setup/BMIRechner-Setup.exe` to the GitHub release of that tag. **Never commit the
+   installer.** `Setup/` is the `OutputDir` of the Inno Setup script, so the file lands there during
+   the build and `.gitignore` covers it afterwards.
 
 The version in the `Changelog.md` has four parts (`1.0.8.0`), the tag has three (`1.0.8`).
 GitVersion turns the tag into the assembly version, so an untagged commit produces something like
 `1.0.8-1+Branch.master.Sha...` and that string would end up in the shipped executable and in the
 window title. Building the installer before the tag is therefore a mistake, not a matter of taste.
+
+For step 8 there is no `gh` on this machine. The GitHub API does the job, with the token that
+`git push` already uses, so nothing has to be stored anywhere:
+
+```bash
+c=$(printf "protocol=https\nhost=github.com\n\n" | git credential fill)
+tok=$(printf "%s" "$c" | grep '^password=' | cut -d= -f2-)
+id=$(curl -s -X POST -H "Authorization: Bearer $tok" \
+  https://api.github.com/repos/SeppPenner/BMIRechner/releases \
+  -d '{"tag_name":"1.0.9","name":"1.0.9"}' | grep -m1 '"id"' | tr -dc 0-9)
+curl -s -X POST -H "Authorization: Bearer $tok" -H "Content-Type: application/octet-stream" \
+  --data-binary @Setup/BMIRechner-Setup.exe \
+  "https://uploads.github.com/repos/SeppPenner/BMIRechner/releases/$id/assets?name=BMIRechner-Setup.exe"
+```
+
+Never print that token, and never write it into a file.
 
 ## Git
 
